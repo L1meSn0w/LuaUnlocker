@@ -1,4 +1,4 @@
-# Note: No longer works as of patch 8.3 on PTR
+# Note: requires windows 10 build 1903 or higher, if you use other versions of windows then revert the fix applied below from Wildstar
 
 # Wow Lua Unlocker
 World of Warcraft Lua Unlocker for Live WoW 7.x to 8.x and Classic<br>
@@ -8,6 +8,7 @@ Website: https://winifix.github.io/<br>
 l0l1dk - the logic shared with me, originally written in D-Lang.<br>
 Ferib - for assembler logic: https://github.com/WiNiFiX/LuaUnlocker/blob/master/Application/Form1.cs#L46-L58<br>
 and https://github.com/WiNiFiX/LuaUnlocker/blob/master/Application/Form1.cs#L74-L85<br>
+Wildstar - for fix related to windows 10 update: https://github.com/WiNiFiX/LuaUnlocker/blob/master/Application/Form1.cs#L67
 
 # How it works
 It just resets the "lua-tainted" address to 0 thousands/millions of times per second<br>
@@ -15,7 +16,7 @@ so all wow "protected lua" functions end up being called without issues 99% of t
 they are fooled into believing they not protected functions so run.<br>
 
 # Will it work on Classic wow?
-As of now (2019.09.13) yes, but that may change at anytime
+As of now (2020.05.03) yes, but that may change at anytime
 
 # Screenshot of it working in Classic Beta 
 ![Screenshot](https://i.imgur.com/GiMAzWy.png)
