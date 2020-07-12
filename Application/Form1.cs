@@ -33,6 +33,10 @@ namespace WindowsForms
             InitializeComponent();
         }
 
+        const uint MEM_COMMIT = 0x00001000;
+        const uint MEM_RESERVE = 0x00002000;
+        const uint PAGE_READWRITE = 4;
+
         private void InjectCode(int id, IntPtr wHandle)
         {
             byte[] asm =
@@ -55,6 +59,20 @@ namespace WindowsForms
 
             AllowCreateRemoteThread(true, wHandle);
             CreateRemoteThread(wHandle, IntPtr.Zero, 0, (IntPtr)hAlloc, IntPtr.Zero, 0, out _);
+            IntPtr loadLibraryAddr = GetProcAddress(GetModuleHandle("kernel32.dll"), "LoadLibraryA");
+
+            string dllName = "batlib.dll";
+
+            IntPtr allocMemAddress = VirtualAllocEx(wHandle, IntPtr.Zero, (uint)((dllName.Length + 1) * Marshal.SizeOf(typeof(char))), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+
+            // writing the name of the dll there
+            UIntPtr bytesWritten;
+            WriteProcessMemory(wHandle, allocMemAddress, System.Text.Encoding.Default.GetBytes(dllName), (uint)((dllName.Length + 1) * Marshal.SizeOf(typeof(char))), out bytesWritten);
+
+            // creating a thread that will call LoadLibraryA with allocMemAddress as argument
+            CreateRemoteThread(wHandle, IntPtr.Zero, 0, loadLibraryAddr, allocMemAddress, 0, IntPtr.Zero);
+
+
             Thread.Sleep(15);
             AllowCreateRemoteThread(false, wHandle);
         }
@@ -143,6 +161,9 @@ namespace WindowsForms
         [DllImport("Kernel32.dll")]
         public static extern bool WriteProcessMemory(IntPtr hwind, long Address, byte[] bytes, int nsize, out int output);
 
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] lpBuffer, uint nSize, out UIntPtr lpNumberOfBytesWritten);
+
         [DllImport("Kernel32.dll")]
         public static extern IntPtr OpenProcess(int Token, bool inheritH, int ProcID);
 
@@ -150,14 +171,21 @@ namespace WindowsForms
         private static extern IntPtr VirtualAllocEx(IntPtr hProcess, long lpAddress,
             uint dwSize, AllocationType flAllocationType, MemoryProtection flProtect);
 
+        [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+        static extern IntPtr VirtualAllocEx(IntPtr hProcess, IntPtr lpAddress, uint dwSize, uint flAllocationType, uint flProtect);
+
         [DllImport("kernel32", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true)]
         public static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
 
         [DllImport("kernel32")]
         public static extern IntPtr GetModuleHandle(string lpModuleName);
 
+
         [DllImport("kernel32.dll")]
         public static extern IntPtr CreateRemoteThread(IntPtr hProcess, IntPtr lpThreadAttributes, uint dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, uint dwCreationFlags, out uint lpThreadId);
+
+        [DllImport("kernel32.dll")]
+        static extern IntPtr CreateRemoteThread(IntPtr hProcess, IntPtr lpThreadAttributes, uint dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);
 
         private enum AllocationType
         {

@@ -59,7 +59,7 @@ namespace FireHack
 				}
 			}
 
-			throw runtime_error("FireHack is not loaded.");
+			throw runtime_error("Batdll is not loaded.");
 		}
 
 		template <typename Type>
@@ -70,7 +70,7 @@ namespace FireHack
 				return Pointer;
 			}
 
-			throw runtime_error("FireHack export " + string(Name) + " not found.");
+			throw runtime_error("Batdll export " + string(Name) + " not found.");
 		}
 	}
 
